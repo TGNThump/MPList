@@ -10,6 +10,7 @@ readline.on('line', (input) => {
 		return;
 	} else if (input === "clear"){
 		console.clear();
+		return;
 	} else if (input === "all"){
 		input = "";
 	}
@@ -30,10 +31,13 @@ readline.on('line', (input) => {
 	let max = Object.values(mps).map(mp => mp.name.length + mp.constituency.length + 2).reduce((a,b) => a > b ? a : b);
 	var results;
 	if (input === "") results = Object.values(mps);
-	else if (input.toUpperCase() in partyCodes){
-		results = Object.values(mps).filter(mp => mp.party === partyCodes[input]);
-	}
-	else results = Object.values(mps).filter(mp => mp.displayAs.toLowerCase().includes(input.toLowerCase()));
+	else if (["LEAVE", "REMAIN", "UNKNOWN"].includes(input.toUpperCase())){
+		results = Object.values(mps).filter(mp => mp.position === input);
+	} else if (input.toUpperCase() === "NONE"){
+		results = Object.values(mps).filter(mp => mp.position == null);
+	} else if (input.toUpperCase() in partyCodes){
+		results = Object.values(mps).filter(mp => mp.party === partyCodes[input.toUpperCase()]);
+	} else results = Object.values(mps).filter(mp => mp.displayAs.toLowerCase().includes(input.toLowerCase()));
 
 	results.forEach(mp => {
 		let party = (party => {
@@ -53,7 +57,7 @@ readline.on('line', (input) => {
 		})(mp.party);
 
 		let age = new String(mp.age ? mp.age : "??");
-		let position = (mp.position ? mp.position.substring(0,7) : "NONE");
+		let position = mp.position ? mp.position : "NONE";
 		while (position.length <= 6) position += " ";
 
 		let role = mp.posts.reduce((a,b) => a + (a.length > 0 ? ", " : " ") + b, "");

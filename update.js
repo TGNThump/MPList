@@ -160,7 +160,7 @@ request({
 		})
 
 		if (mp.displayAs in positions){
-			mps[id].position = positions[mp.displayAs];
+			mps[id].position = positions[mp.displayAs].substring(0,7);
 		}
 	}
 
