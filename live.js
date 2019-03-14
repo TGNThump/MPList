@@ -2,13 +2,33 @@ const request = require('request');
 const cheerio = require('cheerio')
 const mps = require('./mps.js');
 
-var xSecond = 10000;// 10 second
+var xSecond = 10000; // 10 second
 var time = new Date();
 
 time.setMinutes( time.getMinutes() - 10 );
 
+var id;
+
+request('http://data.parliamentlive.tv/api/event/feed', function(error, response, body){
+  if (error || response.statusCode != 200){
+    console.log(error);
+    return;
+  }
+
+  if (!body) return;
+  const $ = cheerio.load(body);
+
+  id = $('title').filter(function(i, el) {
+    return $(this).text() === 'House of Commons';
+  }).siblings('id').first().text();
+
+  poll();
+  setInterval(poll,xSecond);
+});
+
+
 function poll(){
- request('https://parliamentlive.tv/Event/EventLogsBetween/70f2ab78-af53-4cc1-ac15-58178d882629?startTime=' + time.toISOString(), function (error, response, body) {
+ request('https://parliamentlive.tv/Event/EventLogsBetween/' + id + '?startTime=' + time.toISOString(), function (error, response, body) {
    if (!error && response.statusCode == 200) {
     if (!body) return;
     const $ = cheerio.load(body);
@@ -33,15 +53,12 @@ function poll(){
       if (line.endsWith("MP")) line = line.substring(0, line.length-2).trim();
       if (line.endsWith("QC")) line = line.substring(0, line.length-2).trim();
 
-      if (line == "Speaker") line = "John Bercow";
-
-      results = Object.values(mps).filter(mp => mp.displayAs.toLowerCase().includes(line.toLowerCase()));
+      if (line == "Speaker") line = Object.values(mps).filter(mp => mp.party.toLowerCase().includes(line.toLowerCase()));
+      else results = Object.values(mps).filter(mp => mp.displayAs.toLowerCase().includes(line.toLowerCase()));
+      
       if (results.length == 1) results[0].print();
       else console.log(line); 
     } 
    }  
  });
 }
-
-poll();
-setInterval(poll,xSecond);
