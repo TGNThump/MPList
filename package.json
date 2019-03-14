@@ -2,8 +2,10 @@
   "name": "parliment-data",
   "version": "1.0.0",
   "description": "",
-  "main": "data.js",
+  "main": "live.js",
   "scripts": {
+    "update": "node ./update.js",
+    "start": "node ./live.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
