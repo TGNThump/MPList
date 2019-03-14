@@ -2,7 +2,7 @@
 **A tool for listing mps based on data from http://www.data.parliament.uk/**
 
 <p align="center">
-  <img src="screenshot.png" width="80%" title="Screenshot">
+  <img src="screenshot.png" width="100%" title="Screenshot">
 </p>
 
 
