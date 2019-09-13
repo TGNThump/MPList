@@ -14,6 +14,7 @@ function printMP(mp){
 			case "Liberal Democrat": return " LIB ".bgWhite.black;
 			case "Conservative": return " CON ".bgBlue;
 			case "Labour": return " LAB ".bgRed;
+			case "The Independent Group for Change": return " TIG ".bgWhite.black;
 			case "Independent": return " IND ".bgMagenta;
 			case "Democratic Unionist Party": return " DUP ".bgCyan;
 			case "Green Party": return " GRE ".bgGreen;

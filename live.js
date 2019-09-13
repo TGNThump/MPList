@@ -59,6 +59,7 @@ function poll(){
       if (results.length == 1) results[0].print();
       else console.log(line); 
     } 
-   }  
+   } else console.log(error);
+
  });
 }
