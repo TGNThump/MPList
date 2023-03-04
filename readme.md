@@ -1,4 +1,4 @@
-# mplist
+# MPList
 **A tool for listing mps based on data from http://www.data.parliament.uk/**
 
 <p align="center">
