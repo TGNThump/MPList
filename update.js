@@ -6,56 +6,38 @@ var manualTwitters = {
 	"Nigel Adams": "nadams",
 	"Sir David Amess": "amessd_southend",
 	"Mr Richard Bacon": "richardbaconmp",
-	"Sir Kevin Barron": "KevinBarronMP",
 	"Órfhlaith Begley": "OrfhlaithBegley",
 	"Ian Blackford": "IanBlackfordMP",
 	"Andrew Bowie": "AndrewBowieMP",
 	"Steve Brine": "BrineMP",
 	"Chris Bryant": "RhonddaBryant",
 	"John Cryer": "JohnCryerMP",
-	"Mr Jim Cunningham": "jimforcovsouth",
 	"Sir Edward Davey": "EdwardJDavey",
-	"Glyn Davies": "GlynDavies",
 	"Mr David Davis": "DavidDavisMP",
 	"Martyn Day": "MartynDaySNP",
 	"Anneliese Dodds": "AnnelieseDodds",
-	"Dr David Drew": "DavidEDrew",
 	"Chris Evans": "ChrisEvansMP",
 	"Lucy Frazer": "lucyfrazermp",
 	"Sir Roger Gale": "SirRogerGaleMP",
-	"Mr David Gauke": "DavidGauke",
-	"Ruth George": "RuthGeorge6",
 	"Fabian Hamilton": "FabianLeedsNE",
 	"Rebecca Harris": "RebeccaHarrisMP",
 	"Sir Mark Hendrick": "MpHendrick",
-	"Mr Stephen Hepburn": "jarrowstevemp",
 	"Mr Damian Hinds": "DamianHinds",
-	"George Hollingbery": "GHollingbery",
 	"Mr David Jones": "DavidJonesMP",
 	"Kwasi Kwarteng": "KwasiKwarteng",
 	"Tony Lloyd": "tony4rochdale",
 	"Mr Jonathan Lord": "JonathanLord",
-	"Elisha McCallion": "ElishaMcC_SF",
-	"Sir Patrick McLoughlin": "Patrick4Dales",
 	"Esther McVey": "EstherMcVey1",
 	"Mr Khalid Mahmood": "khalid4PB",
-	"Fiona Onasanya": "FionaOnasanyaMP",
-	"Claire Perry": "claireperrymp",
 	"Dominic Raab": "DominicRaab",
 	"Mr Jacob Rees-Mogg": "Jacob_Rees_Mogg",
 	"Mr Laurence Robertson": "lrobertsonTewks",
-	"Mr Geoffrey Robinson": "Geoffrey4CovNW",
 	"Matt Rodda": "MattRodda",
-	"Chris Ruane": "ChrisRuane2017",
-	"David Simpson": "DavidSimpsonDUP",
-	"Gareth Snell": "gareth_snell",
 	"Jamie Stone": "Jamie4North",
 	"Sir Gary Streeter": "garystreeterSWD",
 	"Liz Twist": "LizTwistMP",
 	"Mr Shailesh Vara": "ShaileshVara",
 	"Jeremy Wright": "DCMS_SecOfState",
-	"George Freeman": "GeorgeFreemanMP",
-	"Kate Hoey": "KateHoeyMP",
 };
 
 request({
@@ -75,7 +57,7 @@ request({
   data.members.member.forEach(member => {
   	let mp = {
   		name: member.basicDetails.givenForename + " " + (member.basicDetails.givenMiddleNames ? (member.basicDetails.givenMiddleNames + " ") : "") + member.basicDetails.givenSurname,
-  		displayAs: member.displayAs,
+  		displayAs: member.displayAs.replace(/ +/g, " "),
   		age: parseAge(new Date(member.dateOfBirth)),
   		gender: parseGender(member.gender),
   		constituency: member.memberFrom,
@@ -83,6 +65,12 @@ request({
   		party: null,
   		previousParty: null,
   	};
+
+  	if (member.addresses == null){
+  		member.addresses = {
+  			address: []
+  		};
+  	}
 
 	if (!Array.isArray(member.addresses.address)){
 		member.addresses.address = [member.addresses.address];
@@ -128,15 +116,15 @@ request({
 
 		if (member.governmentPosts != null){
 			if (!Array.isArray(member.governmentPosts.governmentPost)) member.governmentPosts.governmentPost = [member.governmentPosts.governmentPost];
-			member.governmentPosts.governmentPost.forEach(post => posts.push(post.name));
+			member.governmentPosts.governmentPost.filter(post => post.endDate == null).forEach(post => posts.push(post.name));
 		}
 		if (member.oppositionPosts != null){
 			if (!Array.isArray(member.oppositionPosts.oppositionPost)) member.oppositionPosts.oppositionPost = [member.oppositionPosts.oppositionPost];
-			member.oppositionPosts.oppositionPost.forEach(post => posts.push(post.name));
+			member.oppositionPosts.oppositionPost.filter(post => post.endDate == null).forEach(post => posts.push(post.name));
 		}
 		if (member.parliamentaryPosts != null){
 			if (!Array.isArray(member.parliamentaryPosts.parliamentaryPost)) member.parliamentaryPosts.parliamentaryPost = [member.parliamentaryPosts.parliamentaryPost];
-			member.parliamentaryPosts.parliamentaryPost.forEach(post => posts.push(post.name));
+			member.parliamentaryPosts.parliamentaryPost.filter(post => post.endDate == null).forEach(post => posts.push(post.name));
 		}
 
 		mps[member["@MemberId"]].posts = posts;
@@ -155,6 +143,10 @@ request({
 	for (let id in mps){
 		let mp = mps[id];
 
+
+		if (mp.twitter == null)
+		// console.log("\"" + mp.displayAs + "\": \"\",");
+
 		["Sir", "Mrs", "Mr", "Dr", "Ms", "Dame"].forEach(title => {
 			if (mp.displayAs.startsWith(title + " ")) mp.displayAs = mp.displayAs.substring((title + " ").length);
 		})
@@ -169,7 +161,7 @@ request({
 	        return console.log(err);
 	    }
 
-	    console.log("Update Complete!");
+	    // console.log("Update Complete!");
 	}); 
 
   });
